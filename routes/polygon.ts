@@ -28,21 +28,22 @@ router.get('/:id', async (req, res) => {
     })
 
     const { reserveUSD, totalSupply, token0, token1 } = pairResult.data.pair
-    const amountUSD = (amount / 1e18) * (reserveUSD / totalSupply)
+    const pairSymbols = `${token0.symbol}-${token1.symbol}`,
+          amountUSD = (amount / 1e18) * (reserveUSD / totalSupply)
 
     res.json({
       id: +id,
-      description: 'Deposit', // TO-DO
-      amountLpTokens: +amount / 1e18,
-      amountUSD,
-      pool: {
-        id: poolId,
-        tokens: `${token0.symbol}-${token1.symbol}`,
-        url: `https://info.honeyswap.org/#/pair/${poolId}?chainId=137`
-      },
+      description: `Honeyswap farming position on Polygon. $${amountUSD} deposited on pair ${pairSymbols}`,
       status,
       locked,
-      unlockTime: locked ? +unlockTime : null
+      unlockTime: locked ? +unlockTime : null,
+      depositLpTokens: +amount / 1e18,
+      depositUSD: amountUSD,
+      pool: {
+        id: poolId,
+        tokens: pairSymbols,
+        url: `https://info.honeyswap.org/#/pair/${poolId}?chainId=137`
+      }
     })
   } catch (err) {
     console.error(err.message)
